@@ -1,20 +1,26 @@
 [package]
-name = "plainly-rusty"
-version = "0.1.0"
 edition = "2021"
-authors = ["yinnx <yinnnxt@gmail.com>"]
+name = "plainly-rusty"
+version = "0.2.0"
 
 [dependencies]
-actix-web = "4"
-log = "0.4.20"
-serde = { version = "1.0", features = ["derive"] }
-toml = "0.8.8"
-env_logger = "0.10.1"
-sea-orm = { version = "0.12", features = ["sqlx-postgres" , "runtime-tokio-native-tls" , "macros" ] }
-reqwest = "0.11.22"
-serde_json = "1.0.108"
-derive_more = "0.99.17"
-futures-util = "0.3.29"
-futures = "0.3.29"
-async-graphql = "6.0.10"
-async-graphql-actix-web = "6.0.10"
+poem = { version = "1.3.29" }
+async-graphql = { version = "4.0.14", features = ["decimal", "chrono", "dataloader"] }
+async-graphql-poem = { version = "4.0.14" }
+async-trait = { version = "0.1.53" }
+dotenv = "0.15.0"
+sea-orm = { version = "^0.10", features = ["sqlx-postgres", "runtime-async-std-native-tls"] }
+tokio = { version = "1.17.0", features = ["macros", "rt-multi-thread"] }
+tracing = { version = "0.1.34" }
+tracing-subscriber = { version = "0.3.11" }
+lazy_static = { version = "1.4.0" }
+
+[dependencies.seaography]
+version = "^0.3.0" # seaography version
+features = ["with-decimal", "with-chrono"]
+
+[dev-dependencies]
+serde_json = { version = "1.0.82" }
+
+[workspace]
+members = []

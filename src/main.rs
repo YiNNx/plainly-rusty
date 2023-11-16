@@ -1,71 +1,68 @@
-mod handlers;
-mod middlewares;
-mod routers;
-mod utilities;
+use async_graphql::{
+    dataloader::DataLoader,
+    http::{playground_source, GraphQLPlaygroundConfig},
+    EmptyMutation, EmptySubscription, Schema,
+};
+use async_graphql_poem::GraphQL;
+use dotenv::dotenv;
+use lazy_static::lazy_static;
+use plainly_rusty::*;
+use poem::{get, handler, listener::TcpListener, web::Html, IntoResponse, Route, Server};
+use sea_orm::Database;
+use std::env;
 
-use crate::utilities::config::config;
-use actix_web::middleware::Logger;
-use actix_web::{App, HttpServer};
-use middlewares::hello::SayHi;
-use routers::routers::{router_post, router_user};
-
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    env_logger::init();
-
-    HttpServer::new(|| {
-        App::new()
-            .wrap(SayHi)
-            .wrap(Logger::default())
-            .service(router_user())
-            .service(router_post())
-    })
-    .bind((
-        config().application.host.as_str(),
-        config().application.port,
-    ))?
-    .run()
-    .await
+lazy_static! {
+    static ref URL: String = env::var("URL").unwrap_or("0.0.0.0:8000".into());
+    static ref ENDPOINT: String = env::var("ENDPOINT").unwrap_or("/".into());
+    static ref DATABASE_URL: String =
+        env::var("DATABASE_URL").expect("DATABASE_URL environment variable not set");
+    static ref DEPTH_LIMIT: Option<usize> = env::var("DEPTH_LIMIT").map_or(None, |data| Some(
+        data.parse().expect("DEPTH_LIMIT is not a number")
+    ));
+    static ref COMPLEXITY_LIMIT: Option<usize> = env::var("COMPLEXITY_LIMIT")
+        .map_or(None, |data| {
+            Some(data.parse().expect("COMPLEXITY_LIMIT is not a number"))
+        });
 }
 
-// use futures::executor::block_on;
-// use sea_orm::{ConnectionTrait, Database, DbBackend, DbErr, Statement};
+#[handler]
+async fn graphql_playground() -> impl IntoResponse {
+    Html(playground_source(GraphQLPlaygroundConfig::new(&*ENDPOINT)))
+}
 
-// // Change this according to your database implementation,
-// // or supply it as an environment variable.
-// // the whole database URL string follows the following format:
-// // "protocol://username:password@host:port/database"
-// // We put the database name (that last bit) in a separate variable simply for convenience.
-// const DATABASE_URL: &str = "mysql://root:password@localhost:3306";
-// const DB_NAME: &str = "bakeries_db";
-
-// async fn run() -> Result<(), DbErr> {
-//     let db = Database::connect(DATABASE_URL).await?;
-
-//     let db = &match db.get_database_backend() {
-//         DbBackend::Postgres => {
-//             db.execute(Statement::from_string(
-//                 db.get_database_backend(),
-//                 format!("DROP DATABASE IF EXISTS \"{}\";", DB_NAME),
-//             ))
-//             .await?;
-//             db.execute(Statement::from_string(
-//                 db.get_database_backend(),
-//                 format!("CREATE DATABASE \"{}\";", DB_NAME),
-//             ))
-//             .await?;
-
-//             let url = format!("{}/{}", DATABASE_URL, DB_NAME);
-//             Database::connect(&url).await?
-//         }
-//         _ => db,
-//     };
-
-//     Ok(())
-// }
-
-// fn main() {
-//     if let Err(err) = block_on(run()) {
-//         panic!("{}", err);
-//     }
-// }
+#[tokio::main]
+async fn main() {
+    dotenv().ok();
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .with_test_writer()
+        .init();
+    let database = Database::connect(&*DATABASE_URL)
+        .await
+        .expect("Fail to initialize database connection");
+    let orm_dataloader: DataLoader<OrmDataloader> = DataLoader::new(
+        OrmDataloader {
+            db: database.clone(),
+        },
+        tokio::spawn,
+    );
+    let mut schema = Schema::build(QueryRoot, EmptyMutation, EmptySubscription)
+        .data(database)
+        .data(orm_dataloader);
+    if let Some(depth) = *DEPTH_LIMIT {
+        schema = schema.limit_depth(depth);
+    }
+    if let Some(complexity) = *COMPLEXITY_LIMIT {
+        schema = schema.limit_complexity(complexity);
+    }
+    let schema = schema.finish();
+    let app = Route::new().at(
+        &*ENDPOINT,
+        get(graphql_playground).post(GraphQL::new(schema)),
+    );
+    println!("Visit GraphQL Playground at http://{}", *URL);
+    Server::new(TcpListener::bind(&*URL))
+        .run(app)
+        .await
+        .expect("Fail to start web server");
+}
