@@ -1,1 +1,3 @@
 /target
+/configs/dev.toml
+.vscode

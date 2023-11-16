@@ -1,0 +1,14 @@
+[application]
+host = "localhost"
+port = 8080
+debug = true
+
+[database]
+address = "localhost:3000"
+username = "USER"
+password = "PASSWORD"
+database = "DATABASE"
+
+[oauth_github]
+client_id = "CLIENT_ID"
+client_secret = "CLIENT_SECRET"
