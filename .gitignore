@@ -2,6 +2,6 @@
 
 .vscode
 
-/configs/dev.toml
-/deploy/docker-compose-dev.yml
-/deploy/.data
+configs/dev.toml
+deploy/docker-compose-dev.yml
+deploy/.data
