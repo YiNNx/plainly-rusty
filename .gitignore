@@ -4,5 +4,4 @@
 .env
 
 configs/dev.toml
-deploy/docker-compose-dev.yml
 deploy/.data

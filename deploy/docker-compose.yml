@@ -2,14 +2,14 @@ version: '3'
 
 services:
   postgres: 
-    image: postgres:latest
+    image: postgres:14
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./.data/postgres:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=plainlyrusty
-      - POSTGRES_USER=USER
-      - POSTGRES_PASSWORD=PASSWORD
-    container_name: plailyrusty_postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    container_name: plainlyrusty_postgres
     ports:
       - "5432:5432"
