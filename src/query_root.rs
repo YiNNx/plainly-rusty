@@ -10,8 +10,9 @@ pub fn schema(
     depth: Option<usize>,
     complexity: Option<usize>,
 ) -> Result<Schema, SchemaError> {
-    let mut builder = Builder::new(&CONTEXT);
+    let mut builder = Builder::new(&CONTEXT, database.clone());
     seaography::register_entities!(builder, [comments, posts, posttags, tags, users,]);
+    builder.register_enumeration::<crate::entities::sea_orm_active_enums::MpaaRating>();
     let schema = builder.schema_builder();
     let schema = if let Some(depth) = depth {
         schema.limit_depth(depth)
