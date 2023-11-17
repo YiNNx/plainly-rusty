@@ -3,7 +3,7 @@
 use sea_orm::entity::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq)]
-#[sea_orm(table_name = "posttags")]
+#[sea_orm(table_name = "post_tags")]
 pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub post_id: i32,
@@ -16,7 +16,7 @@ pub enum Relation {
     #[sea_orm(
         belongs_to = "super::posts::Entity",
         from = "Column::PostId",
-        to = "super::posts::Column::Pid",
+        to = "super::posts::Column::Id",
         on_update = "NoAction",
         on_delete = "NoAction"
     )]
@@ -24,7 +24,7 @@ pub enum Relation {
     #[sea_orm(
         belongs_to = "super::tags::Entity",
         from = "Column::TagId",
-        to = "super::tags::Column::Tid",
+        to = "super::tags::Column::Id",
         on_update = "NoAction",
         on_delete = "NoAction"
     )]

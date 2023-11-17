@@ -3,8 +3,8 @@
 pub mod prelude;
 
 pub mod comments;
+pub mod post_tags;
 pub mod posts;
-pub mod posttags;
+pub mod sea_orm_active_enums;
 pub mod tags;
 pub mod users;
-pub mod sea_orm_active_enums;

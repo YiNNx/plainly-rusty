@@ -6,29 +6,29 @@ use sea_orm::entity::prelude::*;
 #[sea_orm(table_name = "tags")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub tid: i32,
+    pub id: i32,
     #[sea_orm(unique)]
     pub name: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
-    #[sea_orm(has_many = "super::posttags::Entity")]
-    Posttags,
+    #[sea_orm(has_many = "super::post_tags::Entity")]
+    PostTags,
 }
 
-impl Related<super::posttags::Entity> for Entity {
+impl Related<super::post_tags::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Posttags.def()
+        Relation::PostTags.def()
     }
 }
 
 impl Related<super::posts::Entity> for Entity {
     fn to() -> RelationDef {
-        super::posttags::Relation::Posts.def()
+        super::post_tags::Relation::Posts.def()
     }
     fn via() -> Option<RelationDef> {
-        Some(super::posttags::Relation::Tags.def().rev())
+        Some(super::post_tags::Relation::Tags.def().rev())
     }
 }
 
@@ -36,8 +36,8 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelatedEntity)]
 pub enum RelatedEntity {
-    #[sea_orm(entity = "super::posttags::Entity")]
-    Posttags,
+    #[sea_orm(entity = "super::post_tags::Entity")]
+    PostTags,
     #[sea_orm(entity = "super::posts::Entity")]
     Posts,
 }
