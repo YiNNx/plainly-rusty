@@ -1,13 +1,13 @@
 [application]
-host = "localhost"
-port = 8080
+address = "127.0.0.1:8000"
+graphql_endpoint = "/"
 debug = true
 
+[graphql]
+endpoint = "/"
+
 [database]
-address = "localhost:3000"
-username = "USER"
-password = "PASSWORD"
-database = "DATABASE"
+url = "DATABASE_URL"
 
 [oauth_github]
 client_id = "CLIENT_ID"
