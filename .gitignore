@@ -6,3 +6,4 @@ Cargo.lock
 
 configs/dev.toml
 deploy/.data
+scripts/*.sh
