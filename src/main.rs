@@ -1,4 +1,6 @@
 mod config;
+mod entities;
+mod query;
 
 use actix_web::{guard, web, web::Data, App, HttpResponse, HttpServer, Result};
 use async_graphql::{
@@ -7,7 +9,6 @@ use async_graphql::{
 };
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use config::Config;
-use dotenv::dotenv;
 use sea_orm::Database;
 
 async fn index(schema: web::Data<Schema>, req: GraphQLRequest) -> GraphQLResponse {
@@ -24,7 +25,6 @@ async fn graphql_playground() -> Result<HttpResponse> {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    dotenv().ok();
     tracing_subscriber::fmt()
         .with_max_level(tracing::Level::INFO)
         .with_test_writer()
@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
     let database = Database::connect(&*Config().database.url)
         .await
         .expect("Fail to initialize database connection");
-    let schema = plainly_rusty::query_root::schema(database).unwrap();
+    let schema = query::root::schema(database).unwrap();
     HttpServer::new(move || {
         App::new()
             .app_data(Data::new(schema.clone()))
