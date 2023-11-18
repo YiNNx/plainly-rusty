@@ -1,9 +1,9 @@
+use super::fields::Config;
 use std::env;
 use std::error::Error;
 use std::fs::File;
 use std::io::Read;
 use std::sync::Once;
-use super::config::Config;
 
 const ENV_CONFIG_FILE: &str = "CONFIG_FILE";
 
@@ -18,11 +18,11 @@ fn read_config_file() -> Result<Config, Box<dyn Error>> {
     Ok(cfg)
 }
 
-fn init_config() -> Option<&'static Config> {
+fn init_global_config() -> Option<&'static Config> {
     CONFIG_SET.call_once(|| {
         let c = Box::new(match read_config_file() {
             Ok(c) => c,
-            Err(e) => panic!("config reading failed: {:?}", e),
+            Err(e) => panic!("failed to read config file: {:?}", e),
         });
         unsafe {
             CONFIG = Some(Box::leak(c));
@@ -31,10 +31,10 @@ fn init_config() -> Option<&'static Config> {
     unsafe { CONFIG }
 }
 
-pub fn config() -> &'static Config {
+pub fn global_config() -> &'static Config {
     if CONFIG_SET.is_completed() {
         unsafe { CONFIG.unwrap() }
     } else {
-        init_config().unwrap()
+        init_global_config().expect("failed to init config")
     }
 }

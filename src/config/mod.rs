@@ -1,4 +1,4 @@
-mod config;
 mod bind;
+mod fields;
 
-pub use bind::config as Config;
+pub use bind::global_config;
