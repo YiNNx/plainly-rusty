@@ -1,14 +1,16 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+mod github;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use super::github::client;
 
     #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    fn test() {
+        let rt = tokio::runtime::Runtime::new().unwrap();
+        rt.block_on(async {
+            println!("== test started ==");
+            client::github().await.unwrap();
+            println!("== test finished ==");
+        });
     }
 }
