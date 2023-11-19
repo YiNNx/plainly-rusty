@@ -1,34 +1,16 @@
-use std::collections::BTreeMap;
-
 use actix_web::{http::header::HeaderMap, web, HttpRequest, HttpResponse, Result};
 use async_graphql::dynamic::*;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 use sea_orm::DatabaseConnection;
-use seaography::{Builder, BuilderContext, FnGuard, GuardsConfig};
+use seaography::{Builder, BuilderContext};
 
+use super::guard::register_guard;
 use crate::config::global_config;
 use crate::entities::*;
 
 lazy_static::lazy_static! {
-    static ref CONTEXT : BuilderContext ={
-    let context = BuilderContext::default();
-    let mut entity_guards: BTreeMap<String, FnGuard> = BTreeMap::new();
-    entity_guards.insert("Posts".into(), Box::new(|_ctx| {
-        seaography::GuardAction::Block(None)
-    }));
-    let mut field_guards: BTreeMap<String, FnGuard> = BTreeMap::new();
-    field_guards.insert("Comments.content".into(), Box::new(|_ctx| {
-        seaography::GuardAction::Block(None)
-    }));
-    BuilderContext {
-        guards: GuardsConfig {
-            entity_guards,
-            field_guards,
-        },
-        ..context
-    }
-};
+    static ref CONTEXT : BuilderContext =register_guard(BuilderContext::default());
 }
 
 pub fn schema(database: DatabaseConnection) -> Result<Schema, SchemaError> {

@@ -17,7 +17,7 @@ toml = "0.8.8"
 env_logger = "0.10.1"
 
 [dependencies.seaography]
-git = "https://github.com/SeaQL/seaography.git"
+git = "https://github.com/YiNNx/seaography.git"
 branch = "main"
 features = ["with-decimal", "with-chrono"]
 
