@@ -13,7 +13,7 @@ pub struct GithubClient {
 
 #[derive(serde::Deserialize, Debug)]
 pub struct GithubUserInfo {
-    pub id: Option<isize>,
+    pub id: Option<usize>,
     pub login: Option<String>,
     pub avatar_url: Option<String>,
     pub name: Option<String>,
