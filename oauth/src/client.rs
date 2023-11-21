@@ -21,7 +21,7 @@ pub struct RespExchangeCode {
 
 #[async_trait::async_trait]
 pub trait OauthClient<T: serde::de::DeserializeOwned> {
-    fn new(client_id: String, client_secret: String, user_agent: String) -> Self;
+    fn new(client_id: &String, client_secret: &String, user_agent: &String) -> Self;
 
     fn client_id(&self) -> &String;
     fn client_secret(&self) -> &String;
@@ -29,7 +29,7 @@ pub trait OauthClient<T: serde::de::DeserializeOwned> {
     fn url_token(&self) -> &String;
     fn url_resource(&self) -> &String;
 
-    async fn exchange_code(&self, code: String) -> Result<String, Box<dyn Error>> {
+    async fn code2resource(&self, code: String) -> Result<T, Box<dyn Error>> {
         let request_body = ReqExchangeCode {
             client_id: self.client_id().clone(),
             client_secret: self.client_secret().clone(),
@@ -44,20 +44,17 @@ pub trait OauthClient<T: serde::de::DeserializeOwned> {
             .await?;
 
         let resp_token: RespExchangeCode = resp.json().await?;
-        if let Some(token) = resp_token.access_token {
-            Ok(token)
+        let access_token = if let Some(token) = resp_token.access_token {
+            token
         } else {
             if let Some(err_msg) = resp_token.error {
-                Err(Box::new(crate::error::ErrorCustom(err_msg)))
+                return Err(Box::new(crate::error::ErrorCustom(err_msg)));
             } else {
-                Err(Box::new(crate::error::ErrorCustom(
+                return Err(Box::new(crate::error::ErrorCustom(
                     "unexpected error to get response token".to_string(),
-                )))
+                )));
             }
-        }
-    }
-
-    async fn access_user_resource(&self, access_token: String) -> Result<T, Box<dyn Error>> {
+        };
         let resp = REQ_CLIENT
             .get(self.url_resource())
             .header("Authorization", format!("Bearer {}", access_token))

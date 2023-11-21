@@ -1,6 +1,6 @@
-mod client;
-mod error;
-mod github;
+pub mod client;
+pub mod error;
+pub mod github;
 
 #[cfg(test)]
 mod tests {
@@ -17,16 +17,9 @@ mod tests {
         let rt = tokio::runtime::Runtime::new().unwrap();
         rt.block_on(async {
             println!("== test started ==");
-            let client = GithubClient::new(
-                client_id,
-                client_secret,
-                "plainly-rusty".to_string(),
-            );
-            let token = client
-                .exchange_code(code)
-                .await
-                .unwrap();
-            let res = client.access_user_resource(token).await.unwrap();
+            let client =
+                GithubClient::new(&client_id, &client_secret, &"plainly-rusty".to_string());
+            let res = client.code2resource(code).await.unwrap();
             println!("uid: {:?}", res);
             println!("== test finished ==");
         });

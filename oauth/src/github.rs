@@ -22,11 +22,11 @@ pub struct GithubUserInfo {
 
 #[async_trait::async_trait]
 impl OauthClient<GithubUserInfo> for GithubClient {
-    fn new(client_id: String, client_secret: String, user_agent: String) -> Self {
+    fn new(client_id: &String, client_secret: &String, user_agent: &String) -> Self {
         Self {
-            client_id,
-            client_secret,
-            user_agent,
+            client_id: client_id.clone(),
+            client_secret: client_secret.clone(),
+            user_agent: user_agent.clone(),
             url_token: GITHUB_URL_TOKEN.to_string(),
             url_resource: GITHUB_URL_USER.to_string(),
         }
