@@ -17,6 +17,7 @@ toml = "0.8.8"
 env_logger = "0.10.1"
 log = "0.4"
 jwt-simple = "0.11.9"
+oauth = { path = "./oauth" }
 
 [dependencies.seaography]
 git = "https://github.com/YiNNx/seaography.git"
@@ -27,4 +28,4 @@ features = ["with-decimal", "with-chrono"]
 serde_json = { version = "1.0.103" }
 
 [workspace]
-members = ["./oauth"]
+members = ["oauth"]

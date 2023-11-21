@@ -1,4 +1,4 @@
-#[derive(serde::Deserialize,Debug)]
+#[derive(serde::Deserialize, Debug)]
 pub struct Config {
     pub application: Application,
     pub graphql: GraphQL,
@@ -6,24 +6,26 @@ pub struct Config {
     pub oauth_github: OauthGithub,
 }
 
-#[derive(serde::Deserialize,Debug)]
+#[derive(serde::Deserialize, Debug)]
 pub struct Application {
     pub address: String,
     pub debug: bool,
+    pub owner_github_id: usize,
 }
 
-#[derive(serde::Deserialize,Debug)]
+#[derive(serde::Deserialize, Debug)]
 pub struct GraphQL {
     pub endpoint: String,
 }
 
-#[derive(serde::Deserialize,Debug)]
+#[derive(serde::Deserialize, Debug)]
 pub struct Database {
     pub url: String,
 }
 
-#[derive(serde::Deserialize,Debug)]
+#[derive(serde::Deserialize, Debug)]
 pub struct OauthGithub {
     pub client_id: String,
     pub client_secret: String,
+    pub user_agent: String,
 }

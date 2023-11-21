@@ -1,6 +1,6 @@
 [application]
 address = "127.0.0.1:8000"
-graphql_endpoint = "/"
+owner_github_id = 583231
 debug = true
 
 [graphql]
@@ -12,3 +12,4 @@ url = "DATABASE_URL"
 [oauth_github]
 client_id = "CLIENT_ID"
 client_secret = "CLIENT_SECRET"
+user_agent = "plainly-rusty/0"
