@@ -35,25 +35,11 @@ pub enum Relation {
         on_delete = "NoAction"
     )]
     Posts,
-    #[sea_orm(
-        belongs_to = "super::users::Entity",
-        from = "Column::GithubId",
-        to = "super::users::Column::GithubId",
-        on_update = "NoAction",
-        on_delete = "NoAction"
-    )]
-    Users,
 }
 
 impl Related<super::posts::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Posts.def()
-    }
-}
-
-impl Related<super::users::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Users.def()
     }
 }
 
@@ -65,8 +51,6 @@ pub enum RelatedEntity {
     SelfRef,
     #[sea_orm(entity = "super::posts::Entity")]
     Posts,
-    #[sea_orm(entity = "super::users::Entity")]
-    Users,
     #[sea_orm(entity = "Entity", def = "Relation::SelfRef.def().rev()")]
     SelfRefReverse,
 }

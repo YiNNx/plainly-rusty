@@ -24,10 +24,9 @@ fn custom_builder(context: BuilderContext) -> BuilderContext {
 
 pub fn schema(database: DatabaseConnection) -> Result<Schema, SchemaError> {
     let mut builder = Builder::new(&CONTEXT, database.clone());
-    seaography::register_entities!(builder, [comments, post_tags, posts, tags, users]);
+    seaography::register_entities!(builder, [comments, post_tags, posts, tags]);
     builder.register_enumeration::<sea_orm_active_enums::CommentStatus>();
     builder.register_enumeration::<sea_orm_active_enums::PostStatus>();
-    builder.register_enumeration::<sea_orm_active_enums::UserRole>();
     let schema = builder.schema_builder();
     schema.data(database).finish()
 }

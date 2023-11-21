@@ -1,14 +1,6 @@
-CREATE TYPE user_role AS ENUM ('USER', 'OWNER');
-
 CREATE TYPE post_status AS ENUM ('PRIVATE', 'PUBLIC', 'DELETED');
 
 CREATE TYPE comment_status AS ENUM ('PUBLIC', 'DELETED');
-
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    github_id INT UNIQUE NOT NULL,
-    role user_role DEFAULT 'USER' :: user_role
-);
 
 CREATE TABLE posts (
     id SERIAL PRIMARY KEY,
@@ -45,16 +37,10 @@ CREATE TABLE comments (
     status comment_status DEFAULT 'PUBLIC' :: comment_status,
     FOREIGN KEY (parent_id) REFERENCES comments(id),
     FOREIGN KEY (post_id) REFERENCES posts(id),
-    FOREIGN KEY (github_id) REFERENCES users(github_id),
     CONSTRAINT unique_user_comment UNIQUE (post_id, github_id, content)
 );
 
 ---
-INSERT INTO
-    users (github_id, role)
-VALUES
-    (86813521, 'USER'),
-    (86649490, 'OWNER');
 
 INSERT INTO
     tags (name)
@@ -88,12 +74,12 @@ VALUES
 INSERT INTO
     comments (post_id, github_id, content)
 VALUES
-    (1, 86813521, 'Great introduction!'),
+    (1, 583231, 'Great introduction!'),
     (1, 86649490, 'Looking forward to more posts.'),
-    (2, 86813521, 'These best practices are helpful!');
+    (2, 583231, 'These best practices are helpful!');
 
 INSERT INTO
     comments (parent_id, post_id, github_id, content)
 VALUES
     (1, 1, 86649490, 'Thanks!'),
-    (4, 2, 86813521, 'Glad you found them helpful!');
+    (4, 2, 583231, 'Glad you found them helpful!');

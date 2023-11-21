@@ -20,11 +20,3 @@ pub enum PostStatus {
     #[sea_orm(string_value = "PUBLIC")]
     Public,
 }
-#[derive(Debug, Clone, PartialEq, Eq, EnumIter, DeriveActiveEnum)]
-#[sea_orm(rs_type = "String", db_type = "Enum", enum_name = "user_role")]
-pub enum UserRole {
-    #[sea_orm(string_value = "OWNER")]
-    Owner,
-    #[sea_orm(string_value = "USER")]
-    User,
-}
