@@ -2,7 +2,6 @@ use actix_web::{http::header::HeaderMap, web, HttpRequest, HttpResponse, Result}
 use async_graphql::dynamic::Schema;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
-use log::info;
 
 use crate::config::global_config;
 

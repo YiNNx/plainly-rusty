@@ -1,25 +1,24 @@
-use seaography::{BuilderContext, FnGuard, GuardsConfig};
+use seaography::FnGuard;
 use std::collections::BTreeMap;
 
 use super::guards::{all_block, user_query_only};
 
-pub fn register_guard(context: BuilderContext) -> BuilderContext {
+pub fn entity_guards() -> BTreeMap<String, FnGuard> {
     let entity_guards = [("Posts".to_string(), Box::new(all_block))];
+
+    let mut map_guards: BTreeMap<String, FnGuard> = BTreeMap::new();
+    for guard in entity_guards {
+        map_guards.insert(guard.0, guard.1);
+    }
+    map_guards
+}
+
+pub fn field_guards() -> BTreeMap<String, FnGuard> {
     let field_guards = [("Comments.content".to_string(), Box::new(user_query_only))];
 
-    let mut m_entity: BTreeMap<String, FnGuard> = BTreeMap::new();
-    for guard in entity_guards {
-        m_entity.insert(guard.0, guard.1);
-    }
-    let mut m_field: BTreeMap<String, FnGuard> = BTreeMap::new();
+    let mut map_guards: BTreeMap<String, FnGuard> = BTreeMap::new();
     for guard in field_guards {
-        m_field.insert(guard.0, guard.1);
+        map_guards.insert(guard.0, guard.1);
     }
-    BuilderContext {
-        guards: GuardsConfig {
-            entity_guards: m_entity,
-            field_guards: m_field,
-        },
-        ..context
-    }
+    map_guards
 }
