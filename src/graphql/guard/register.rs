@@ -1,10 +1,10 @@
 use seaography::FnGuard;
 use std::collections::BTreeMap;
 
-use super::guards::{all_block, user_query_only};
+use super::guards::guard_user_accessible;
 
 pub fn entity_guards() -> BTreeMap<String, FnGuard> {
-    let entity_guards = [("Posts".to_string(), Box::new(all_block))];
+    let entity_guards = [("Posts".to_string(), Box::new(guard_user_accessible))];
 
     let mut map_guards: BTreeMap<String, FnGuard> = BTreeMap::new();
     for guard in entity_guards {
@@ -14,7 +14,10 @@ pub fn entity_guards() -> BTreeMap<String, FnGuard> {
 }
 
 pub fn field_guards() -> BTreeMap<String, FnGuard> {
-    let field_guards = [("Comments.content".to_string(), Box::new(user_query_only))];
+    let field_guards = [(
+        "Comments.content".to_string(),
+        Box::new(guard_user_accessible),
+    )];
 
     let mut map_guards: BTreeMap<String, FnGuard> = BTreeMap::new();
     for guard in field_guards {
