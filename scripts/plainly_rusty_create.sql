@@ -49,17 +49,19 @@ VALUES
     ('Database');
 
 INSERT INTO
-    posts (title, content, summary)
+    posts (title, content, summary, status)
 VALUES
     (
         'Getting Started with PostgreSQL',
         'PostgreSQL is a powerful open-source relational database...',
-        'Learn the basics of PostgreSQL.'
+        'Learn the basics of PostgreSQL.',
+        'PUBLIC'
     ),
     (
         'Web Development Best Practices',
         'Follow these best practices for building scalable and maintainable web applications...',
-        'Improve your web development skills.'
+        'Improve your web development skills.',
+        'PRIVATE'
     );
 
 INSERT INTO

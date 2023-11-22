@@ -3,7 +3,7 @@ use sea_orm::DatabaseConnection;
 use seaography::{register_entities, Builder, BuilderContext, GuardsConfig};
 
 use super::guards::{entity_guards, field_guards};
-use super::user::mutation_grant_token;
+use super::user::{mutation_comment, mutation_grant_token};
 use crate::entities::{comments, post_tags, posts, sea_orm_active_enums::*, tags};
 
 lazy_static::lazy_static! {
@@ -17,7 +17,7 @@ fn custom_builder(context: BuilderContext) -> BuilderContext {
             field_guards: field_guards(),
         },
         custom_query_fields: vec![],
-        custom_mutation_fields: vec![mutation_grant_token()],
+        custom_mutation_fields: vec![mutation_grant_token(), mutation_comment()],
         ..context
     }
 }

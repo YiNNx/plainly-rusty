@@ -7,7 +7,7 @@ lazy_static! {
 
 #[derive(Serialize, Deserialize, PartialEq)]
 pub enum Role {
-    User,
+    Guest,
     Owner,
 }
 

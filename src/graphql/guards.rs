@@ -1,10 +1,11 @@
 use async_graphql::dynamic::ResolverContext;
+use jwt_simple::prelude::JWTClaims;
 use seaography::{FnGuard, GuardAction};
 use std::collections::BTreeMap;
 
 use crate::config::global_config;
 use crate::graphql::context::{OperationType, OperationType::Mutation, OperationType::Query};
-use crate::utilities::jwt::{verify_jwt, Role};
+use crate::utilities::jwt::{verify_jwt, ClaimRole, Role};
 
 pub fn entity_guards() -> BTreeMap<String, FnGuard> {
     let entity_guards: Vec<(&str, FnGuard)> = vec![
@@ -22,14 +23,14 @@ pub fn entity_guards() -> BTreeMap<String, FnGuard> {
 }
 
 pub fn field_guards() -> BTreeMap<String, FnGuard> {
-    let field_guards = [
-        ("Comments.content", guard_public),
-        ("Comments.content", guard_public),
+    let field_guards: Vec<(&str, FnGuard)> = vec![
+        ("Comments.content", Box::new(guard_public)),
+        ("Comments.content", Box::new(guard_public)),
     ];
 
     let mut map_guards: BTreeMap<String, FnGuard> = BTreeMap::new();
     for guard in field_guards {
-        map_guards.insert(guard.0.into(), Box::new(guard.1));
+        map_guards.insert(guard.0.into(), guard.1);
     }
     map_guards
 }
@@ -47,27 +48,27 @@ pub fn _guard_private(ctx: &ResolverContext<'_>) -> GuardAction {
 }
 
 fn public(ctx: &ResolverContext<'_>) -> Result<GuardAction, async_graphql::Error> {
-    let ty = ctx.data::<OperationType>()?;
-
-    if *ty == Query {
+    let op = ctx.data::<OperationType>()?;
+    if *op == Query {
         Ok(GuardAction::Allow)
     } else {
-        let token = ctx.data::<String>()?;
-        let claims = verify_jwt(token)?;
-        if claims.custom.rol == Role::Owner {
-            Ok(GuardAction::Allow)
-        } else {
-            Ok(GuardAction::Block(Some("no permission".into())))
+        let claims = ctx.data::<JWTClaims<ClaimRole>>()?;
+        if claims.custom.rol == Role::Guest {
+            return Ok(GuardAction::Block(Some("no permission".into())));
         }
+        Ok(GuardAction::Allow)
     }
 }
 
 fn user_editable(ctx: &ResolverContext<'_>) -> Result<GuardAction, async_graphql::Error> {
-    let ty = ctx.data::<OperationType>()?;
+    let query = ctx.data::<String>()?;
+    if query.contains("Batch") {
+        return Ok(GuardAction::Block(Some("no permission".into())));
+    }
 
-    if *ty == Mutation {
-        let token = ctx.data::<String>()?;
-        verify_jwt(token)?;
+    let op = ctx.data::<OperationType>()?;
+    if *op == Mutation {
+        ctx.data::<JWTClaims<ClaimRole>>()?;
     }
     Ok(GuardAction::Allow)
 }
