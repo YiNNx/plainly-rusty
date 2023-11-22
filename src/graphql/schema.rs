@@ -2,7 +2,7 @@ use async_graphql::dynamic::{Schema, SchemaError};
 use sea_orm::DatabaseConnection;
 use seaography::{register_entities, Builder, BuilderContext, GuardsConfig};
 
-use super::custom::{mutation_comment, mutation_grant_token};
+use super::custom::{comment, grant_token};
 use super::guards::guard_public;
 use super::guards::{entity_guards, field_guards};
 use crate::entities::{comments, post_tags, posts, sea_orm_active_enums::*, tags};
@@ -23,7 +23,7 @@ fn custom_builder(context: BuilderContext) -> BuilderContext {
             field_guards: field_guards(vec![]),
         },
         custom_query_fields: vec![],
-        custom_mutation_fields: vec![mutation_grant_token(), mutation_comment()],
+        custom_mutation_fields: vec![grant_token(), comment()],
         ..context
     }
 }

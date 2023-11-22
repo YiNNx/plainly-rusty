@@ -1,25 +1,35 @@
 use crate::utilities::jwt::verify_jwt;
 use actix_web::HttpRequest;
 
+use crate::utilities::jwt::Role;
+
 #[derive(PartialEq)]
 pub enum OperationType {
     Query,
     Mutation,
 }
 
-fn jwt_from_req(req: &HttpRequest) -> Option<String> {
+pub type Subject = i32;
+
+fn jwt(req: &HttpRequest) -> Option<String> {
     Some(
         req.headers()
             .get(actix_web::http::header::AUTHORIZATION)?
             .to_str()
-            .unwrap_or("")
-            .strip_prefix("Bearer ")
-            .unwrap_or("")
+            .ok()?
+            .strip_prefix("Bearer ")?
             .into(),
     )
 }
 
-fn operation_type_from_req(req: &async_graphql::Request) -> OperationType {
+fn claims(jwt: String) -> Option<(Subject, Role)> {
+    let claims = verify_jwt(&jwt).ok()?;
+    let rol = claims.custom.rol;
+    let sub = claims.subject?.parse::<i32>().ok()?;
+    Some((sub, rol))
+}
+
+fn operation_type(req: &async_graphql::Request) -> OperationType {
     if req.query.contains("mutation") {
         OperationType::Mutation
     } else {
@@ -31,10 +41,9 @@ pub fn set_context_data(
     mut req: async_graphql::Request,
     req_http: &HttpRequest,
 ) -> async_graphql::Request {
-    if let Ok(claims) = verify_jwt(&jwt_from_req(&req_http).unwrap_or("".into())) {
-        req = req.data(claims);
+    if let Some(claims) = jwt(req_http).and_then(claims) {
+        req = req.data(claims.0).data(claims.1);
     }
-    let op = operation_type_from_req(&req);
-    let query = req.query.clone();
-    req.data(op).data(query)
+    let op = operation_type(&req);
+    req.data(op)
 }

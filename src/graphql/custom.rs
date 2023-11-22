@@ -1,15 +1,11 @@
-use crate::entities::{prelude::*, *};
 use async_graphql::{dynamic::*, Value};
-use jwt_simple::prelude::JWTClaims;
-use sea_orm::ActiveValue;
-use sea_orm::*;
+use sea_orm::{ActiveValue, EntityTrait};
 use seaography::{CustomMutation, CustomMutationArgument};
 
+use super::context::Subject;
 use crate::config::global_config;
-use crate::utilities::jwt::{
-    ClaimRole,
-    Role::{Guest, Owner},
-};
+use crate::entities::{comments, prelude::Comments};
+use crate::utilities::jwt::Role::{Guest, Owner};
 use oauth::{client::OauthClient, github::GithubClient};
 
 lazy_static::lazy_static! {
@@ -20,7 +16,7 @@ lazy_static::lazy_static! {
     );
 }
 
-pub fn mutation_grant_token() -> CustomMutation {
+pub fn grant_token() -> CustomMutation {
     CustomMutation {
         name: "tokenGrant".into(),
         arguments: vec![CustomMutationArgument {
@@ -52,7 +48,7 @@ pub fn mutation_grant_token() -> CustomMutation {
     }
 }
 
-pub fn mutation_comment() -> CustomMutation {
+pub fn comment() -> CustomMutation {
     CustomMutation {
         name: "comment".into(),
         arguments: vec![
@@ -68,25 +64,13 @@ pub fn mutation_comment() -> CustomMutation {
         ty: TypeRef::named_nn(TypeRef::INT),
         resolver_fn: Box::new(|ctx| {
             FieldFuture::new(async move {
-                let content = ctx.args.try_get("content")?.string()?.to_string();
-                let post_id = ctx.args.try_get("post_id")?.i64()?;
-                let sub = ctx
-                    .data::<JWTClaims<ClaimRole>>()?
-                    .subject
-                    .clone()
-                    .ok_or(async_graphql::Error::new(
-                        "failed to convert sub".to_string(),
-                    ))?
-                    .parse::<i32>()?;
-                let db = ctx.data::<sea_orm::DatabaseConnection>()?;
-
                 let res = Comments::insert(comments::ActiveModel {
-                    post_id: ActiveValue::Set(post_id.to_owned() as i32),
-                    github_id: ActiveValue::Set(sub),
-                    content: ActiveValue::Set(content),
+                    post_id: ActiveValue::Set(ctx.args.try_get("post_id")?.i64()? as i32),
+                    github_id: ActiveValue::Set(*ctx.data::<Subject>()?),
+                    content: ActiveValue::Set(ctx.args.try_get("content")?.string()?.to_string()),
                     ..Default::default()
                 })
-                .exec(db)
+                .exec(ctx.data::<sea_orm::DatabaseConnection>()?)
                 .await?;
                 Ok(Some(Value::from(res.last_insert_id)))
             })
