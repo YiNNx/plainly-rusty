@@ -2,8 +2,9 @@ use async_graphql::dynamic::{Schema, SchemaError};
 use sea_orm::DatabaseConnection;
 use seaography::{register_entities, Builder, BuilderContext, GuardsConfig};
 
+use super::custom::{mutation_comment, mutation_grant_token};
+use super::guards::guard_public;
 use super::guards::{entity_guards, field_guards};
-use super::user::{mutation_comment, mutation_grant_token};
 use crate::entities::{comments, post_tags, posts, sea_orm_active_enums::*, tags};
 
 lazy_static::lazy_static! {
@@ -13,8 +14,13 @@ lazy_static::lazy_static! {
 fn custom_builder(context: BuilderContext) -> BuilderContext {
     BuilderContext {
         guards: GuardsConfig {
-            entity_guards: entity_guards(),
-            field_guards: field_guards(),
+            entity_guards: entity_guards(vec![
+                ("Posts", Box::new(guard_public)),
+                ("Tags", Box::new(guard_public)),
+                ("PostTags", Box::new(guard_public)),
+                ("Comments", Box::new(guard_public)),
+            ]),
+            field_guards: field_guards(vec![]),
         },
         custom_query_fields: vec![],
         custom_mutation_fields: vec![mutation_grant_token(), mutation_comment()],

@@ -1,8 +1,14 @@
 use jwt_simple::prelude::*;
 use lazy_static::lazy_static;
 
+use crate::config::global_config;
+
 lazy_static! {
-    static ref JWT_KEY: HS256Key = HS256Key::generate();
+    static ref JWT_KEY: HS256Key = if global_config().application.debug {
+        HS256Key::from_bytes("test".as_bytes())
+    } else {
+        HS256Key::generate()
+    };
 }
 
 #[derive(Serialize, Deserialize, PartialEq)]

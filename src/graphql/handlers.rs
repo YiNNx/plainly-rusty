@@ -3,25 +3,17 @@ use async_graphql::dynamic::Schema;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 
-use super::context::{jwt_from_req, operation_type_from_req};
+use super::context::set_context_data;
 use crate::config::global_config;
-use crate::utilities::jwt::verify_jwt;
 
 pub async fn index(
     schema: web::Data<Schema>,
     req: GraphQLRequest,
     req_http: HttpRequest,
 ) -> GraphQLResponse {
-    let mut request = req.into_inner();
-
-    if let Ok(claims) = verify_jwt(&jwt_from_req(&req_http).unwrap_or("".into())) {
-        request = request.data(claims);
-    }
-
-    let op = operation_type_from_req(&request);
-    let query = request.query.clone();
+    let request = req.into_inner();
     schema
-        .execute(request.data(op).data(query))
+        .execute(set_context_data(request, &req_http))
         .await
         .into()
 }

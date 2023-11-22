@@ -65,7 +65,7 @@ pub fn mutation_comment() -> CustomMutation {
                 ty: TypeRef::named_nn(TypeRef::INT),
             },
         ],
-        ty: TypeRef::named_nn(TypeRef::STRING),
+        ty: TypeRef::named_nn(TypeRef::INT),
         resolver_fn: Box::new(|ctx| {
             FieldFuture::new(async move {
                 let content = ctx.args.try_get("content")?.string()?.to_string();
