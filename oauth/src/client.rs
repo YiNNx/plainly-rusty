@@ -30,38 +30,30 @@ pub trait OauthClient<T: serde::de::DeserializeOwned> {
     fn url_resource(&self) -> &String;
 
     async fn code2resource(&self, code: String) -> Result<T, Box<dyn Error>> {
-        let request_body = ReqExchangeCode {
-            client_id: self.client_id().clone(),
-            client_secret: self.client_secret().clone(),
-            code: code,
-        };
-        let resp = REQ_CLIENT
+        let resp_exchange: RespExchangeCode = REQ_CLIENT
             .post(self.url_token())
             .header("Accept", "application/json")
             .header("User-Agent", self.user_agent())
-            .json(&request_body)
+            .json(&ReqExchangeCode {
+                client_id: self.client_id().clone(),
+                client_secret: self.client_secret().clone(),
+                code: code,
+            })
             .send()
+            .await?
+            .json()
             .await?;
-
-        let resp_token: RespExchangeCode = resp.json().await?;
-        let access_token = if let Some(token) = resp_token.access_token {
-            token
-        } else {
-            if let Some(err_msg) = resp_token.error {
-                return Err(Box::new(crate::error::ErrorCustom(err_msg)));
-            } else {
-                return Err(Box::new(crate::error::ErrorCustom(
-                    "unexpected error to get response token".to_string(),
-                )));
-            }
-        };
+        let access_token = resp_exchange.access_token.ok_or(
+            resp_exchange
+                .error
+                .unwrap_or("unexpected error to get response token".into()),
+        )?;
         let resp = REQ_CLIENT
             .get(self.url_resource())
             .header("Authorization", format!("Bearer {}", access_token))
             .header("User-Agent", self.user_agent())
             .send()
             .await?;
-
         if resp.status() != StatusCode::OK {
             let resp_text = resp.text().await?;
             return Err(Box::new(crate::error::ErrorCustom(resp_text)));
