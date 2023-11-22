@@ -1,5 +1,6 @@
-pub mod index;
+pub mod handlers;
 pub mod schema;
 
-mod guard;
+mod guards;
 mod user;
+mod context;

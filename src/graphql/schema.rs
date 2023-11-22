@@ -1,10 +1,10 @@
 use async_graphql::dynamic::{Schema, SchemaError};
 use sea_orm::DatabaseConnection;
-use seaography::{Builder, BuilderContext, GuardsConfig};
+use seaography::{register_entities, Builder, BuilderContext, GuardsConfig};
 
-use super::guard::register::{entity_guards, field_guards};
+use super::guards::{entity_guards, field_guards};
 use super::user::mutation_grant_token;
-use crate::entities::*;
+use crate::entities::{comments, post_tags, posts, sea_orm_active_enums::*, tags};
 
 lazy_static::lazy_static! {
     static ref CONTEXT : BuilderContext =custom_builder(BuilderContext::default());
@@ -24,9 +24,9 @@ fn custom_builder(context: BuilderContext) -> BuilderContext {
 
 pub fn schema(database: DatabaseConnection) -> Result<Schema, SchemaError> {
     let mut builder = Builder::new(&CONTEXT, database.clone());
-    seaography::register_entities!(builder, [comments, post_tags, posts, tags]);
-    builder.register_enumeration::<sea_orm_active_enums::CommentStatus>();
-    builder.register_enumeration::<sea_orm_active_enums::PostStatus>();
+    register_entities!(builder, [comments, post_tags, posts, tags]);
+    builder.register_enumeration::<CommentStatus>();
+    builder.register_enumeration::<PostStatus>();
     let schema = builder.schema_builder();
     schema.data(database).finish()
 }

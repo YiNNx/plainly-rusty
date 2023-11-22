@@ -7,14 +7,14 @@ use actix_web::{guard, web, web::Data, App, HttpServer};
 use sea_orm::Database;
 
 use config::global_config;
-use graphql::index::{graphql_playground, index};
+use graphql::handlers::{graphql_playground, index};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     env_logger::init();
     let database = Database::connect(&*global_config().database.url)
         .await
-        .expect("failed to connect to the postgres");
+        .expect("failed to connect to the database");
     let schema = graphql::schema::schema(database).expect("failed to load schema");
     HttpServer::new(move || {
         App::new()
