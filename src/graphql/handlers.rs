@@ -11,15 +11,14 @@ pub async fn index(
     req: GraphQLRequest,
     req_http: HttpRequest,
 ) -> GraphQLResponse {
-    let request = req.into_inner();
+    let mut request = req.into_inner();
 
-    let jwt = jwt_from_req(&req_http).unwrap_or("".into());
+    let jwt = jwt_from_req(&req_http);
+    if let Some(jwt) = jwt {
+        request = request.data(jwt);
+    }
     let operation_type = operation_type_from_req(&request);
-
-    schema
-        .execute(request.data(operation_type).data(jwt))
-        .await
-        .into()
+    schema.execute(request.data(operation_type)).await.into()
 }
 
 pub async fn graphql_playground() -> Result<HttpResponse> {

@@ -15,7 +15,7 @@ lazy_static::lazy_static! {
 
 pub fn mutation_grant_token() -> CustomMutation {
     CustomMutation {
-        name: "grantToken".into(),
+        name: "tokenGrant".into(),
         arguments: vec![CustomMutationArgument {
             name: "code".into(),
             ty: TypeRef::named_nn(TypeRef::STRING),

@@ -7,7 +7,6 @@ CREATE TABLE posts (
     title VARCHAR(255) NOT NULL,
     time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     content TEXT NOT NULL,
-    views INT DEFAULT 0,
     summary TEXT,
     status post_status DEFAULT 'PUBLIC' :: post_status,
     CONSTRAINT unique_title_content UNIQUE (title, content)
@@ -19,8 +18,8 @@ CREATE TABLE tags (
 );
 
 CREATE TABLE post_tags (
-    post_id INT,
-    tag_id INT,
+    post_id INT NOT NULL,
+    tag_id INT NOT NULL,
     PRIMARY KEY (post_id, tag_id),
     FOREIGN KEY (post_id) REFERENCES posts(id),
     FOREIGN KEY (tag_id) REFERENCES tags(id),
@@ -30,8 +29,8 @@ CREATE TABLE post_tags (
 CREATE TABLE comments (
     id SERIAL PRIMARY KEY,
     parent_id INT,
-    post_id INT,
-    github_id INT,
+    post_id INT NOT NULL,
+    github_id INT NOT NULL,
     time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     content TEXT NOT NULL,
     status comment_status DEFAULT 'PUBLIC' :: comment_status,

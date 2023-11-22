@@ -12,7 +12,6 @@ pub struct Model {
     pub time: Option<DateTime>,
     #[sea_orm(column_type = "Text")]
     pub content: String,
-    pub views: Option<i32>,
     #[sea_orm(column_type = "Text", nullable)]
     pub summary: Option<String>,
     pub status: Option<PostStatus>,

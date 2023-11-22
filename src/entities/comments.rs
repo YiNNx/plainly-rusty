@@ -9,8 +9,8 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,
     pub parent_id: Option<i32>,
-    pub post_id: Option<i32>,
-    pub github_id: Option<i32>,
+    pub post_id: i32,
+    pub github_id: i32,
     pub time: Option<DateTime>,
     #[sea_orm(column_type = "Text")]
     pub content: String,
