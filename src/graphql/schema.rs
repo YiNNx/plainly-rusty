@@ -2,9 +2,9 @@ use async_graphql::dynamic::{Schema, SchemaError};
 use sea_orm::DatabaseConnection;
 use seaography::{register_entities, Builder, BuilderContext, GuardsConfig};
 
-use super::custom::{comment, grant_token};
-use super::guards::guard_public;
-use super::guards::{entity_guards, field_guards};
+use super::custom_resolver::{comment, grant_token};
+use super::guard::guard_public;
+use super::guard::{entity_guards, field_guards};
 use crate::entities::{comments, post_tags, posts, sea_orm_active_enums::*, tags};
 
 lazy_static::lazy_static! {

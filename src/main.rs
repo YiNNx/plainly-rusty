@@ -7,7 +7,7 @@ use actix_web::{guard, web, web::Data, App, HttpServer};
 use sea_orm::Database;
 
 use config::global_config;
-use graphql::handlers::{graphql_playground, index};
+use graphql::index::{graphql_playground, index};
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {

@@ -1,6 +1,6 @@
-pub mod handlers;
+pub mod index;
 pub mod schema;
 
-mod guards;
-mod custom;
+mod guard;
+mod custom_resolver;
 mod context;
