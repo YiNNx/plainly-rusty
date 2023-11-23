@@ -39,7 +39,7 @@ CREATE TABLE comments (
     CONSTRAINT unique_user_comment UNIQUE (post_id, github_id, content)
 );
 
----
+--- SAMPLE DATA
 
 INSERT INTO
     tags (name)
@@ -61,7 +61,7 @@ VALUES
         'Web Development Best Practices',
         'Follow these best practices for building scalable and maintainable web applications...',
         'Improve your web development skills.',
-        'PRIVATE'
+        'PUBLIC'
     );
 
 INSERT INTO
