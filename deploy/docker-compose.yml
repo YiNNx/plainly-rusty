@@ -11,5 +11,17 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     container_name: plainlyrusty_postgres
+  app:
+    image: plainlyrusty:${IMAGE_VERSION}
+    environment:
+      - TZ=Asia/Shanghai
+      - RUST_LOG=${RUST_LOG}
+      - CONFIG_FILE=/mnt/${CONFIG_FILE}
     ports:
-      - "5432:5432"
+      - "8000:8000"
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ../configs:/mnt/configs
+    depends_on:
+      - postgres
+    container_name: plainlyrusty_app

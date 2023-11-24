@@ -1,6 +1,6 @@
 # plainly-rusty
 
-It originally started as a simple, almost mundane backend rewrite project, for my old blog [backend](https://github.com/YiNNx/Blog-BE). However, as I delved into learning Rust and explored Rust crates associated with web development, it turned to an exploratory venture, to explore the potential of replacing conventional CRUD repetitive tasks through GraphQL & higher-level code abstraction with the features of Rust & Seaography in backend projects.
+It originally started as a straightforward, almost mundane backend rewrite project, for my old blog [backend](https://github.com/YiNNx/Blog-BE). However, as I delved into learning Rust and explored Rust crates associated with web development, it turned to an exploratory venture, to explore the potential of replacing conventional CRUD repetitive tasks through GraphQL & higher-level code abstraction with the features of Rust & Seaography in backend projects.
 
 ## Features
 
@@ -13,7 +13,7 @@ It originally started as a simple, almost mundane backend rewrite project, for m
 1. Set the postgres and import the schema with `scripts/plainly_rusty_create.sql`
 
    ```shell
-   psql -q postgres://{user}:{pwd}@{addr}/plainlyrusty < scripts/plainly-rusty-schema.sql
+   psql -q {postgres_url} < scripts/plainly-rusty-schema.sql
    ```
 
 2. Modify or replace the default configuration file, `configs/default.toml`.
@@ -23,7 +23,18 @@ It originally started as a simple, almost mundane backend rewrite project, for m
    ```shell
    RUST_LOG={log_level} CONFIG_FILE={file_path} cargo run
    ```
-
+   
+   Or use Docker:
+   
+   ```shell
+   export POSTGRES_PASSWORD={pwd} RUST_LOG={level} CONFIG_FILE={file_path} IMAGE_VERSION={version} 
+   
+   cargo build --release --target x86_64-unknown-linux-musl
+   
+   docker build -f deploy/build/Dockerfile . -t plainlyrusty:${IMAGE_VERSION}
+   docker compose -f deploy/docker-compose.yml up
+   ```
+   
 
 ## Query Sample
 

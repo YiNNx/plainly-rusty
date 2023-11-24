@@ -5,7 +5,10 @@ edition = "2021"
 authors = ["yinnx <yinnnxt@gmail.com>"]
 
 [dependencies]
-reqwest = { version = "0.11", features = ["json"] }
+reqwest = { version = "0.11", default-features = false, features = [
+    "json",
+    "rustls-tls",
+] }
 serde_json = "1.0.108"
 serde = { version = "1.0", features = ["derive"] }
 futures = "0.3"
