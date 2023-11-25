@@ -10,7 +10,7 @@ pub struct Config {
 pub struct Application {
     pub address: String,
     pub debug: bool,
-    pub owner_github_id: usize,
+    pub owner_github_name: String,
 }
 
 #[derive(serde::Deserialize, Debug)]

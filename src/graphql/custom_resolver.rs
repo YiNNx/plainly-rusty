@@ -32,16 +32,16 @@ pub fn grant_token() -> CustomMutation {
                     Ok(u) => u,
                     Err(e) => return Err(async_graphql::Error::new(e.to_string())),
                 };
-                let id = match user_info.id {
-                    Some(id) => id,
+                let username = match user_info.login {
+                    Some(username) => username,
                     None => return Err(async_graphql::Error::new("uncaught error".to_string())),
                 };
-                let role = if id == global_config().application.owner_github_id {
+                let role = if username == global_config().application.owner_github_name {
                     Owner
                 } else {
                     Guest
                 };
-                let jwt = crate::utilities::jwt::create_jwt(id, role)?;
+                let jwt = crate::utilities::jwt::create_jwt(username, role)?;
                 Ok(Some(Value::from(jwt)))
             })
         }),
@@ -66,7 +66,7 @@ pub fn comment() -> CustomMutation {
             FieldFuture::new(async move {
                 let res = Comments::insert(comments::ActiveModel {
                     post_id: ActiveValue::Set(ctx.args.try_get("post_id")?.i64()? as i32),
-                    github_id: ActiveValue::Set(*ctx.data::<Subject>()?),
+                    github_name: ActiveValue::Set(ctx.data::<Subject>()?.clone()),
                     content: ActiveValue::Set(ctx.args.try_get("content")?.string()?.to_string()),
                     ..Default::default()
                 })

@@ -36,6 +36,7 @@ log = "0.4"
 jwt-simple = "0.11.9"
 oauth = { path = "./oauth" }
 actix-cors = "0.6.4"
+rss = "2.0.6"
 
 [dependencies.seaography]
 git = "https://github.com/YiNNx/seaography.git"

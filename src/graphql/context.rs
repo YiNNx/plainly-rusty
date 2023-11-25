@@ -9,7 +9,7 @@ pub enum OperationType {
     Mutation,
 }
 
-pub type Subject = i32;
+pub type Subject = String;
 
 fn jwt(req: &HttpRequest) -> Option<String> {
     Some(
@@ -25,7 +25,7 @@ fn jwt(req: &HttpRequest) -> Option<String> {
 fn claims(jwt: String) -> Option<(Subject, Role)> {
     let claims = verify_jwt(&jwt).ok()?;
     let rol = claims.custom.rol;
-    let sub = claims.subject?.parse::<i32>().ok()?;
+    let sub = claims.subject?.parse::<Subject>().ok()?;
     Some((sub, rol))
 }
 

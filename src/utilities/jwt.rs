@@ -22,7 +22,7 @@ pub struct ClaimCustom {
     pub rol: Role,
 }
 
-pub fn create_jwt(sub: usize, rol: Role) -> Result<String, jwt_simple::Error> {
+pub fn create_jwt(sub: String, rol: Role) -> Result<String, jwt_simple::Error> {
     let claims = Claims::with_custom_claims(ClaimCustom { rol: rol }, Duration::from_days(7))
         .with_subject(sub);
     JWT_KEY.authenticate(claims)

@@ -10,7 +10,8 @@ pub struct Model {
     pub id: i32,
     pub parent_id: Option<i32>,
     pub post_id: i32,
-    pub github_id: i32,
+    #[sea_orm(column_type = "Text")]
+    pub github_name: String,
     pub time: Option<DateTime>,
     #[sea_orm(column_type = "Text")]
     pub content: String,

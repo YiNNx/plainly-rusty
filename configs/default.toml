@@ -1,6 +1,6 @@
 [application]
 address = "127.0.0.1:8000"
-owner_github_id = 583231
+owner_github_name = "octocat"
 debug = true
 
 [graphql]
