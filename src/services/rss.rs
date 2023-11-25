@@ -1,9 +1,11 @@
+use crate::config::global_config;
 use crate::entities::{posts, prelude::Posts};
 use crate::utilities::rss::*;
 use actix_web::{web, HttpResponse, Result};
 use sea_orm::*;
 
 pub async fn rss(db: web::Data<sea_orm::DatabaseConnection>) -> Result<HttpResponse> {
+    let link = &global_config().application.url;
     let items: Vec<Item> = Posts::find()
         .filter(posts::Column::Status.eq("PUBLIC"))
         .order_by_desc(posts::Column::Time)
@@ -11,32 +13,44 @@ pub async fn rss(db: web::Data<sea_orm::DatabaseConnection>) -> Result<HttpRespo
         .await
         .unwrap_or(vec![])
         .into_iter()
-        .map(|post| Item {
-            title: post.title,
-            link: format!("http://localhost:8000/post/{}", post.id),
-            description: post.summary.unwrap_or("".into()),
-            pub_date: post.time.unwrap().to_string(),
-            guid: Guid {
-                value: post.id.to_string(),
-                is_permalink: false,
-            },
+        .map(|post| {
+            let post_link = format!("{}/post/{}", link, post.id);
+            Item {
+                title: post.title,
+                link: post_link.clone(),
+                description: CDATA {
+                    value: markdown::to_html(&post.content),
+                },
+                pub_date: post.time.unwrap().to_string(),
+                guid: Guid {
+                    value: post_link.clone(),
+                    is_permalink: false,
+                },
+                category: "".into(),
+                source: Source {
+                    url: post_link,
+                    text: global_config().rss_channel.title.clone(),
+                },
+            }
         })
         .collect();
-
-    let rss_data = RssData {
-        version: "1.0".to_string(),
+    let rss_data = Rss {
+        version: "2.0".into(),
         channel: Channel {
-            title: "just-plain.fun".to_string(),
-            link: "https://just-plain.fun".to_string(),
-            description: "".to_string(),
-            language: "zh-cn".to_string(),
-            pub_date: "".to_string(),
-            last_build_date: "".to_string(),
-            managing_editor: "".to_string(),
-            web_master: "".to_string(),
-            items: items,
+            title: global_config().rss_channel.title.clone(),
+            link: link.clone(),
+            item: items,
+            description: CDATA {
+                value: global_config().rss_channel.description.clone(),
+            },
+            copyright: global_config().rss_channel.copyright.clone(),
+            ttl: 5,
         },
     };
-    let resp = rss_data.to_string().unwrap_or("".into());
-    Ok(HttpResponse::Ok().content_type("text/xml").body(resp))
+    match rss_data.to_string() {
+        Ok(resp) => Ok(HttpResponse::Ok().content_type("text/xml").body(resp)),
+        Err(e) => Ok(HttpResponse::InternalServerError()
+            .content_type("text/xml")
+            .body(e.to_string())),
+    }
 }

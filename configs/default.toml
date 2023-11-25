@@ -1,7 +1,8 @@
 [application]
 address = "127.0.0.1:8000"
-owner_github_name = "octocat"
+url = "http://127.0.0.1:8000"
 debug = true
+owner_github_name = "octocat"
 
 [graphql]
 endpoint = "/"
@@ -13,3 +14,8 @@ url = "DATABASE_URL"
 client_id = "CLIENT_ID"
 client_secret = "CLIENT_SECRET"
 user_agent = "plainly-rusty/0"
+
+[rss_channel]
+title = ""
+description = ""
+copyright = ""
