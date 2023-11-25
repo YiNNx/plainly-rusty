@@ -3,7 +3,7 @@ use seaography::{FnGuard, GuardAction};
 use std::collections::BTreeMap;
 
 use crate::config::global_config;
-use crate::graphql::context::{OperationType, OperationType::Query};
+use crate::services::context::{OperationType, OperationType::Query};
 use crate::utilities::jwt::Role;
 
 fn public(ctx: &ResolverContext<'_>) -> Result<GuardAction, async_graphql::Error> {

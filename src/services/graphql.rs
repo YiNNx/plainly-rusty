@@ -3,8 +3,8 @@ use async_graphql::dynamic::Schema;
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 use async_graphql_actix_web::{GraphQLRequest, GraphQLResponse};
 
-use super::context::set_context_data;
 use crate::config::global_config;
+use crate::services::context::set_context_data;
 
 pub async fn index(
     schema: web::Data<Schema>,

@@ -31,7 +31,7 @@ It originally started as a straightforward, almost mundane backend rewrite proje
    
    cargo build --release --target x86_64-unknown-linux-musl
    
-   docker build -f deploy/build/Dockerfile . -t plainlyrusty:${IMAGE_VERSION}
+   docker build -f deploy/build/Dockerfile . -t plainlyrusty:${IMAGE_VERSION} 
    docker compose -f deploy/docker-compose.yml up
    ```
    
