@@ -16,6 +16,10 @@ lazy_static::lazy_static! {
     );
 }
 
+fn to_async_err(e: Box<dyn std::error::Error>) -> async_graphql::Error {
+    async_graphql::Error::new(e.to_string())
+}
+
 pub fn grant_token() -> CustomMutation {
     CustomMutation {
         name: "tokenGrant".into(),
@@ -26,16 +30,12 @@ pub fn grant_token() -> CustomMutation {
         ty: TypeRef::named_nn(TypeRef::STRING),
         resolver_fn: Box::new(|ctx| {
             FieldFuture::new(async move {
-                let code = ctx.args.try_get("code")?.string()?.to_string();
-                let res = OAUTH_CLIENT.code2resource(code).await;
-                let user_info = match res {
-                    Ok(u) => u,
-                    Err(e) => return Err(async_graphql::Error::new(e.to_string())),
-                };
-                let username = match user_info.login {
-                    Some(username) => username,
-                    None => return Err(async_graphql::Error::new("uncaught error".to_string())),
-                };
+                let username = OAUTH_CLIENT
+                    .code2resource(ctx.args.try_get("code")?.string()?.into())
+                    .await
+                    .map_err(to_async_err)?
+                    .login
+                    .ok_or(async_graphql::Error::new("uncaught error".to_string()))?;
                 let role = if username == global_config().application.owner_github_name {
                     Owner
                 } else {
@@ -46,6 +46,10 @@ pub fn grant_token() -> CustomMutation {
             })
         }),
     }
+}
+
+fn login_needed(_: async_graphql::Error) -> async_graphql::Error {
+    async_graphql::Error::new("You need to log in first.".to_string())
 }
 
 pub fn comment() -> CustomMutation {
@@ -66,7 +70,9 @@ pub fn comment() -> CustomMutation {
             FieldFuture::new(async move {
                 let res = Comments::insert(comments::ActiveModel {
                     post_id: ActiveValue::Set(ctx.args.try_get("post_id")?.i64()? as i32),
-                    github_name: ActiveValue::Set(ctx.data::<Subject>()?.clone()),
+                    github_name: ActiveValue::Set(
+                        ctx.data::<Subject>().map_err(login_needed)?.clone(),
+                    ),
                     content: ActiveValue::Set(ctx.args.try_get("content")?.string()?.to_string()),
                     ..Default::default()
                 })
