@@ -15,12 +15,15 @@ pub async fn rss(db: web::Data<sea_orm::DatabaseConnection>) -> Result<HttpRespo
         .into_iter()
         .map(|post| {
             let post_link = format!("{}/post/{}", link, post.id);
+            let mut html_output = String::new();
+            pulldown_cmark::html::push_html(
+                &mut html_output,
+                pulldown_cmark::Parser::new(&post.content),
+            );
             Item {
                 title: post.title,
                 link: post_link.clone(),
-                description: CDATA {
-                    value: markdown::to_html(&post.content),
-                },
+                description: CDATA { value: html_output },
                 pub_date: post.time.unwrap().to_string(),
                 guid: Guid {
                     value: post_link.clone(),
