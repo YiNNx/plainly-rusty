@@ -1,6 +1,6 @@
 # plainly-rusty
 
-It originally started as a straightforward, almost mundane backend rewrite project, for my old blog [backend](https://github.com/YiNNx/Blog-BE). However, as I delved into learning Rust and explored Rust crates associated with web development, it turned to an exploratory venture, to explore the potential of replacing conventional CRUD repetitive tasks through GraphQL & higher-level code abstraction with the features of Rust & Seaography in backend projects.
+It originally started as a straightforward, almost boring backend rewrite project, for my old blog [backend](https://github.com/YiNNx/Blog-BE). However, as I delved into learning Rust and explored Rust crates associated with web development, it turned to an exploratory venture.
 
 ## Features
 
